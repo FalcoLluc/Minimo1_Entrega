@@ -44,4 +44,9 @@ public class PuntosInteresManagerTest {
         this.pm.registrarPunto("1",10,10);
         Assert.assertEquals(this.pm.getUsuariosPorPunto(10,10).size(),1);
     }
+    @Test
+    public void listaPuntosTipo(){
+        this.pm.nuevoPuntoInteres(23,45,ElementType.BRIDGE);
+        Assert.assertEquals(this.pm.getPuntosPorTipo(ElementType.BRIDGE).size(),2);
+    }
 }
