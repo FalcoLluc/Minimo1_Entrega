@@ -1,5 +1,7 @@
 package edu.upc.dsa;
 
+import edu.upc.dsa.exceptions.ElementTypeNoValidoException;
+import edu.upc.dsa.exceptions.IdUsadoException;
 import edu.upc.dsa.exceptions.PuntoNoExistenteException;
 import edu.upc.dsa.exceptions.UsuarioNotFoundException;
 import edu.upc.dsa.models.ElementType;
@@ -7,6 +9,7 @@ import edu.upc.dsa.models.PuntoInteres;
 import edu.upc.dsa.models.Usuario;
 import org.apache.log4j.Logger;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class PuntosInteresManagerImpl implements PuntosInteresManager {
@@ -28,7 +31,11 @@ public class PuntosInteresManagerImpl implements PuntosInteresManager {
     }
 
     @Override
-    public Usuario nuevoUsuario(String id, String nombre, String apellidos, String correo, String nacimiento) {
+    public Usuario nuevoUsuario(String id, String nombre, String apellidos, String correo, LocalDate nacimiento) {
+        if(this.usuarioHashMap.containsKey(id)){
+            logger.warn("Id ya usado");
+            throw new IdUsadoException("ID YA EXISTENTE");
+        }
         Usuario u=new Usuario(id,nombre,apellidos,correo,nacimiento);
         usuarioHashMap.put(id,u);
         logger.info("Nuevo Usuario: "+u.toString());
@@ -66,7 +73,11 @@ public class PuntosInteresManagerImpl implements PuntosInteresManager {
     }
 
     @Override
-    public PuntoInteres nuevoPuntoInteres(int horizontal, int vertical, ElementType tipo) {
+    public PuntoInteres nuevoPuntoInteres(int horizontal, int vertical, ElementType tipo) throws ElementTypeNoValidoException {
+        if (tipo == null) {
+            logger.warn("Tipo No Valido");
+            throw new ElementTypeNoValidoException("Tipo de Punto de Interes No Valida");
+        }
         PuntoInteres p = new PuntoInteres(horizontal,vertical,tipo);
         this.puntosMapa.add(p);
         logger.info("Nuevo Punto: "+p.toString());

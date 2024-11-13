@@ -1,5 +1,7 @@
 package edu.upc.dsa.models;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,11 +10,11 @@ public class Usuario {
     private String nombre;
     private String apellidos;
     private String correo;
-    private String fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private List<PuntoInteres> puntosInteres;
 
-    public Usuario(String id, String nombre, String apellidos, String correo, String fechaNacimiento) {
+    public Usuario(String id, String nombre, String apellidos, String correo, LocalDate fechaNacimiento) {
         this.id = id;
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -55,11 +57,11 @@ public class Usuario {
         this.correo = correo;
     }
 
-    public String getFechaNacimiento() {
+    public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(String fechaNacimiento) {
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 
@@ -72,6 +74,7 @@ public class Usuario {
     }
 
     public void addPunto(PuntoInteres p){this.puntosInteres.add(p);}
+
 
     @Override
     public String toString() {

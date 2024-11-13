@@ -3,6 +3,8 @@ package edu.upc.dsa.services;
 
 import edu.upc.dsa.PuntosInteresManager;
 import edu.upc.dsa.PuntosInteresManagerImpl;
+import edu.upc.dsa.exceptions.ElementTypeNoValidoException;
+import edu.upc.dsa.exceptions.IdUsadoException;
 import edu.upc.dsa.exceptions.PuntoNoExistenteException;
 import edu.upc.dsa.exceptions.UsuarioNotFoundException;
 import edu.upc.dsa.models.ElementType;
@@ -17,6 +19,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.util.List;
 
 @Api(value = "/puntosInteres", description = "Endpoint to Puntos InteresService")
@@ -31,14 +34,15 @@ public class PuntosInteresService {
             this.pm.nuevoPuntoInteres(40,20, ElementType.COIN);
         }
         if(pm.sizeUsuarios()==0){
-            this.pm.nuevoUsuario("1","Lluc","Fernández","llff2003ae@gmail.com","25/11/2003");
-            this.pm.nuevoUsuario("2","Joan","Alvarez","alvarito@gmail.com","12/10/2002");
+            this.pm.nuevoUsuario("1","Lluc","Fernández","llff2003ae@gmail.com", LocalDate.of(2003, 11, 25));
+            this.pm.nuevoUsuario("2","Joan","Alvarez","alvarito@gmail.com",LocalDate.of(2001, 10, 3));
         }
     }
     @POST
     @ApiOperation(value = "register a new User", notes = "asdasd")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successful", response=Usuario.class),
+            @ApiResponse(code = 510, message = "Id Ya Existente"),
             @ApiResponse(code = 500, message = "Validation Error")
 
     })
@@ -46,8 +50,13 @@ public class PuntosInteresService {
     @Path("/usuarios")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response nuevoUsuario(Usuario user) {
-        if (user.getId()==null||user.getNombre()==null||user.getApellidos()==null||user.getCorreo()==null||user.getFechaNacimiento()==null)  return Response.status(500).build();
-        Usuario u= this.pm.nuevoUsuario(user.getId(),user.getNombre(),user.getApellidos(),user.getCorreo(),user.getFechaNacimiento());
+        if (user.getId()==null||user.getNombre()==null||user.getApellidos()==null||user.getCorreo()==null)  return Response.status(500).build();
+        Usuario u;
+        try{
+            u= this.pm.nuevoUsuario(user.getId(),user.getNombre(),user.getApellidos(),user.getCorreo(),user.getFechaNacimiento());
+        } catch (IdUsadoException e) {
+            return Response.status(510).build();
+        }
         return Response.status(201).entity(u).build();
     }
 
@@ -90,13 +99,19 @@ public class PuntosInteresService {
     @ApiOperation(value = "register a new Punto", notes = "asdasd")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successful", response=PuntoInteres.class),
+            @ApiResponse(code = 511, message = "Tipo Punto Interes No Valido"),
             @ApiResponse(code = 500, message = "Validation Error")
 
     })
     @Path("/puntosInteres")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response nuevoPunto(PuntoInteres punto) {
-        PuntoInteres p= this.pm.nuevoPuntoInteres(punto.getHorizontal(),punto.getVertical(),punto.getTipo());
+        PuntoInteres p;
+        try{
+            p= this.pm.nuevoPuntoInteres(punto.getHorizontal(),punto.getVertical(),punto.getTipo());
+        } catch (ElementTypeNoValidoException e) {
+            return Response.status(511).build();
+        }
         return Response.status(201).entity(p).build();
     }
 
